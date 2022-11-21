@@ -6,12 +6,25 @@ async function findTicketTypes() {
 }
 
 async function findAllUserTickets(enrollmentId: number) {
-  return prisma.ticket.findMany({
+  return prisma.ticket.findFirst({
     where: { enrollmentId },
     include: { TicketType: true }
   });
 }
 
-const ticketsRepository = { findTicketTypes, findAllUserTickets };
+async function insertNewTicket(enrollmentId: number, ticketTypeId: number) {
+  return prisma.ticket.create({
+    data: {
+      ticketTypeId,
+      enrollmentId,
+      status: "RESERVED"
+    },
+    include: {
+      TicketType: true,
+    }
+  });
+}
+
+const ticketsRepository = { findTicketTypes, findAllUserTickets, insertNewTicket };
 
 export default ticketsRepository;

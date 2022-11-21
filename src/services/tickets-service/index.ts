@@ -4,6 +4,7 @@ import enrollmentRepository from "@/repositories/enrollment-repository";
 
 async function getAllTicketsType() {
   const allTicketsTypes = await ticketsRepository.findTicketTypes();
+
   return allTicketsTypes;
 }
 
@@ -13,11 +14,20 @@ async function getAllUserTicketById(userId: number) {
 
   const userTickets = await ticketsRepository.findAllUserTickets(userEnrollment.id);
 
-  if (userTickets.length === 0) throw notFoundError();
+  if (!userTickets) throw notFoundError();
 
   return userTickets;
 }
 
-const ticketsService = { getAllTicketsType, getAllUserTicketById };
+async function createNewTicket( userId: number, ticketTypeId: number ) {
+  const userEnrollment = await enrollmentRepository.findWithAddressByUserId(userId);
+  if (!userEnrollment) throw notFoundError();
+
+  const createdTicket = await ticketsRepository.insertNewTicket(userEnrollment.id, ticketTypeId);
+
+  return createdTicket;
+}
+
+const ticketsService = { getAllTicketsType, getAllUserTicketById, createNewTicket };
 
 export default ticketsService;
